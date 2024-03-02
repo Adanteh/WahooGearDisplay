@@ -30,19 +30,14 @@ internal class Bluetooth
     /// </summary>
     public bool Connected { get; set; } = false;
 
-    public IAppSettings settings;
+    private readonly IAppSettings settings;
 
-    public Bluetooth()
+    public Bluetooth(IAppSettings settings)
     {
-        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-        var settingsPath = Path.Combine(appData, "WahooShift", "appsettings.json");
-        settings = new ConfigurationBuilder<IAppSettings>()
-            .UseJsonFile(settingsPath)
-            .Build();
 
         Gears = new WahooGears();
-        Buttons = new WahooButtons(settings.Keybinds);
-
+        Buttons = new WahooButtons(settings.Keybinds, settings.ButtonsEnabled);
+        this.settings = settings;
     }
 
     /// <summary>
@@ -77,8 +72,8 @@ internal class Bluetooth
     }
 
     /// <summary>
-    /// Because Bluetooth.ScanForDevicesAsync is quite slow, we'll always attempt to connect to
-    /// the last used ID once first.
+    /// Because Bluetooth.ScanForDevicesAsync is quite slow, we'll attempt to connect to
+    /// the last used ID once first, which is a lot faster.
     /// </summary>
     /// <returns></returns>
     public async Task<bool> AttemptLastConnection()

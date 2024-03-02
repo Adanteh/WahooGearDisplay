@@ -75,15 +75,22 @@ class WahooButtons
     /// </summary>
     public event EventHandler<string>? KeyPress;
     //! Characteristic ID for button system
-    private static readonly Guid charasteristicUid = new("a026e03c-0a7d-4ab3-97fa-f1500f9feb8b");
+    private static readonly Guid characteristicId = new("a026e03c-0a7d-4ab3-97fa-f1500f9feb8b");
     //! Connected characteristic
     private GattCharacteristic? characteristic;
+    /// <summary>
+    /// True if buttons should actually be handled.
+    /// Bluetooth characteristic will still be subscribed too for easy on-the-fly enabling/diabling
+    /// </summary>
+    public bool Enabled { get; set; } = true;
 
     private List<KickrButton> Buttons { get; init; }
 
-    public WahooButtons(IKeybinds keybinds)
+
+    public WahooButtons(IKeybinds keybinds, bool buttonsEnabled)
     {
         Buttons = KickrButton.PrepareButtons(keybinds);
+        this.Enabled = buttonsEnabled;
     }
 
     /// <summary>
@@ -93,7 +100,7 @@ class WahooButtons
     /// <returns>True if connected</returns>
     public async Task<bool> Connect(GattService service)
     {
-        characteristic = await service.GetCharacteristicAsync(charasteristicUid);
+        characteristic = await service.GetCharacteristicAsync(characteristicId);
         if (characteristic == null)
             return false;
 
@@ -109,6 +116,9 @@ class WahooButtons
     /// <param name="e"></param>
     private void Callback(object? sender, GattCharacteristicValueChangedEventArgs e)
     {
+        // Don't handle if buttons are disabled
+        if (!Enabled) return;
+
         if (e.Value.Length < 3)
             return;
 

@@ -1,3 +1,5 @@
+using Config.Net;
+using WahooShift.Configuration;
 using WahooShift.Utils;
 namespace WahooShift;
 
@@ -6,7 +8,9 @@ namespace WahooShift;
 /// </summary>
 public partial class Overlay : Form
 {
-    private readonly Bluetooth bluetooth = new();
+    private IAppSettings settings;
+
+    private readonly Bluetooth bluetooth;
 
     /// <summary>
     /// Cleanup the key that was pressed after debounce time. This means that if you press any buttons, 2 seconds after the last press the label will hide again
@@ -25,8 +29,17 @@ public partial class Overlay : Form
     {
         InitializeComponent();
 
+        // Register adjustable settings
+        var appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+        var settingsPath = Path.Combine(appData, "WahooShift", "appsettings.json");
+        settings = new ConfigurationBuilder<IAppSettings>()
+            .UseJsonFile(settingsPath)
+            .Build();
+
         // Run our bluetooth stuff
-        RegisterBluetooth();
+        bluetooth = new Bluetooth(settings);
+        var blueThread = new Thread(new ThreadStart(bluetooth.ScanAndConnect));
+        blueThread.Start();
 
         // Register bluetooth events to be handled by this UI.
         bluetooth.Gears.GearChange += Gears_GearChange;
@@ -36,8 +49,8 @@ public partial class Overlay : Form
         this.gears = new WahooGearEventArgs { FrontCurrent = 1, FrontTotal = 2, RearCurrent = 5, RearTotal = 11 };
         this.MouseDown += Form1_MouseDown;
         this.Paint += Repaint;
+        this.FormClosing += RememberUiState;
     }
-
 
     // Settings to handle dragging borderless window
     public const int WM_NCLBUTTONDOWN = 0xA1;
@@ -72,9 +85,38 @@ public partial class Overlay : Form
         BottomField.Visible = false;
         debounceKeyInfo.Elapsed += HideKeybindLabel;
 
+        RestoreUiState();
         SetAsOverlay();
-        
     }
+
+    /// <summary>
+    /// Restore UI location and size
+    /// </summary>
+    private void RestoreUiState()
+    {
+        if (settings.UserInterface.xPos != null && settings.UserInterface.yPos != null)
+        {
+            Location = new Point((int)settings.UserInterface.xPos, (int)settings.UserInterface.yPos);
+        }
+
+        if (settings.UserInterface.width != null && settings.UserInterface.height != null)
+        {
+            Size = new Size((int)settings.UserInterface.width, (int)settings.UserInterface.height);
+        }
+    }
+
+    /// <summary>
+    /// Save UI location and sizefor next startup
+    /// </summary>
+    private void RememberUiState(object? sender, FormClosingEventArgs e)
+    {
+        settings.UserInterface.xPos = Location.X;
+        settings.UserInterface.yPos = Location.Y;
+
+        settings.UserInterface.width = Size.Width;
+        settings.UserInterface.height = Size.Height;
+    }
+
 
     /// <summary>
     /// Sets best settings I could find as 'overlay' like app in forms
@@ -88,14 +130,6 @@ public partial class Overlay : Form
         Focus();
     }
 
-    /// <summary>
-    /// Start our bluetooth functionality
-    /// </summary>
-    private void RegisterBluetooth()
-    {
-        var blueThread = new Thread(new ThreadStart(bluetooth.ScanAndConnect));
-        blueThread.Start();
-    }
 
     /// <summary>
     /// Connected to bluetooth fully (Inc services, characteristics etc)
