@@ -46,6 +46,22 @@ class KickrButton
     /// <returns></returns>
     public static List<KickrButton> PrepareButtons(IKeybinds keybinds)
     {
+        // Set the default keybinds, doing it this way instead of setting them as defaults in IKeybinds
+        // because this will make sure all keybinds are properly written to the json.
+        // (I fully expect there's a way to actually write the .json to include defaults, but too lazy to look it up)
+        keybinds.RightFront ??= "UP";
+        keybinds.RightBack ??= "DOWN";
+        keybinds.RightInside ??= "";
+        keybinds.RightLarge ??= "";
+        keybinds.RightSmall ??= "";
+        keybinds.RightBrake ??= "ENTER";
+        keybinds.LeftFront ??= "RIGHT";
+        keybinds.LeftBack ??= "LEFT";
+        keybinds.LeftInside ??= "";
+        keybinds.LeftLarge ??= "";
+        keybinds.LeftSmall ??= "";
+        keybinds.LeftBrake ??= "ESC";
+
         return new()
         {
             new KickrButton(0x00, 0x01, "right front", keybinds.RightFront),

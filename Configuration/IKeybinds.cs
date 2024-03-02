@@ -3,43 +3,32 @@
 namespace WahooShift.Configuration;
 
 /// <summary>
-/// Container to be able to remap buttons
+/// Container to be able to remap buttons.
+/// All keybinds are set in WahooButtons.PrepareButtons
 /// </summary>
 public interface IKeybinds
 {
-    [Option(DefaultValue = "UP")]
-    string RightFront { get; }
+    string? RightFront { get; set;}
 
-    [Option(DefaultValue = "DOWN")]
-    string RightBack { get; }
+    string? RightBack { get; set;}
 
-    [Option(DefaultValue = "")]
-    string RightInside { get; }
+    string? RightInside { get; set;}
 
-    [Option(DefaultValue = "")]
-    string RightLarge { get; }
+    string? RightLarge { get; set;}
 
-    [Option(DefaultValue = "")]
-    string RightSmall { get; }
+    string? RightSmall { get; set;}
 
-    [Option(DefaultValue = "ENTER")]
-    string RightBrake { get; }
+    string? RightBrake { get; set;}
 
-    [Option(DefaultValue = "RIGHT")]
-    string LeftFront { get; }
+    string? LeftFront { get; set;}
 
-    [Option(DefaultValue = "LEFT")]
-    string LeftBack { get; }
+    string? LeftBack { get; set;}
 
-    [Option(DefaultValue = "")]
-    string LeftInside { get; }
+    string? LeftInside { get; set;}
 
-    [Option(DefaultValue = "")]
-    string LeftLarge { get; }
+    string? LeftLarge { get; set;}
 
-    [Option(DefaultValue = "")]
-    string LeftSmall { get; }
+    string? LeftSmall { get; set;}
 
-    [Option(DefaultValue = "ESC")]
-    string LeftBrake { get; }
+    string? LeftBrake { get; set;  }
 }
