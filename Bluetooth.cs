@@ -36,7 +36,7 @@ internal class Bluetooth
     {
 
         Gears = new WahooGears();
-        Buttons = new WahooButtons(settings.Keybinds, settings.ButtonsEnabled);
+        Buttons = new WahooButtons(settings.Keybinds);
         this.settings = settings;
     }
 
@@ -48,6 +48,9 @@ internal class Bluetooth
         // Check if we could autconnect to the last item, if we could we're all good here
         if (await AttemptLastConnection())
             return;
+
+        // Prepare default device name. Done this way instead of default value in the settings, to write it to the json.
+        settings.Bluetooth.DeviceName ??= "KICKR BIKE";
 
         Debug.WriteLine("Waiting for bluetooth connection to Wahoo");
         var filter = new BluetoothLEScanFilter();

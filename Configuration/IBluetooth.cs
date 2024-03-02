@@ -11,6 +11,5 @@ public interface IBluetooth
     /// <summary>
     /// Name of kickr bike. Does partial match, needs to be updated if someone were to change the name
     /// </summary>
-    [Option(DefaultValue = "KICKR BIKE")]
-    string DeviceName { get; set; }
+    string? DeviceName { get; set; }
 }

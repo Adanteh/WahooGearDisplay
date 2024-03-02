@@ -103,10 +103,10 @@ class WahooButtons
     private List<KickrButton> Buttons { get; init; }
 
 
-    public WahooButtons(IKeybinds keybinds, bool buttonsEnabled)
+    public WahooButtons(IKeybinds keybinds)
     {
         Buttons = KickrButton.PrepareButtons(keybinds);
-        this.Enabled = buttonsEnabled;
+        Enabled = keybinds.Enabled ??= true;
     }
 
     /// <summary>

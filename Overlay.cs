@@ -101,7 +101,10 @@ public partial class Overlay : Form
 
         if (settings.UserInterface.width != null && settings.UserInterface.height != null)
         {
-            Size = new Size((int)settings.UserInterface.width, (int)settings.UserInterface.height);
+            // Do some minimum values in case the user resizes the UI to be size that is not useable
+            var width = Math.Max((int)settings.UserInterface.width, 200);
+            var height = Math.Max((int)settings.UserInterface.height, 100);
+            Size = new Size(width, height);
         }
     }
 
@@ -114,7 +117,7 @@ public partial class Overlay : Form
         settings.UserInterface.yPos = Location.Y;
 
         settings.UserInterface.width = Size.Width;
-        settings.UserInterface.height = Size.Height;
+        settings.UserInterface.height = Size.Height + 20;  // FIXME: Setting the same width/height the UI ends up getting smaller on every launch??
     }
 
 
@@ -181,10 +184,10 @@ public partial class Overlay : Form
 
         const int MARGIN = 10;
         var availableWidth = this.Size.Width - (5 * MARGIN);  // 10PX margin on each side, plus 20PX margin between front/rear
-        var gearHeight = this.Size.Height - (2 * MARGIN);
-        var yCenter = MARGIN + (gearHeight / 2);
+        var availableHeight = this.Size.Height - (4 * MARGIN);  // FIXME: For some reason the title seems to be part of height, for now we'll just double margins because that seems to fix it kind of
+        var maxGearOffset = (availableHeight / 2) - 5;
 
-        // TODO: Maybe allow some config, just for the sake of it?
+
         var showFrontRings = gears.FrontTotal > 1;
         var gearWidth = Convert.ToInt32(availableWidth / (showFrontRings ? gears.FrontTotal + gears.RearTotal : gears.RearTotal));
 
@@ -196,7 +199,8 @@ public partial class Overlay : Form
             for (int i = 0; i < gears.FrontTotal; i++)
             {
                 var heightOffset = (gears.FrontTotal - 1 - i) * 20;
-                var rect = new Rectangle(x, MARGIN + heightOffset, gearWidth, gearHeight - (heightOffset * 2));
+                var gearHeight = availableHeight - (heightOffset * 2);
+                var rect = new Rectangle(x, MARGIN + heightOffset, gearWidth, gearHeight);
                 if ((i + 1) == gears.FrontCurrent)
                     formGraphics.FillRectangle(brushFill, rect);
 
@@ -212,8 +216,9 @@ public partial class Overlay : Form
 
         for (int i = 0; i < gears.RearTotal; i++)
         {
-            var height = Math.Max(gearHeight - (i * 10), 10);
-            var rect = new Rectangle(x, yCenter - height / 2, gearWidth, height);
+            var heightOffset = Math.Min(i * 5, maxGearOffset);
+            var gearHeight = availableHeight - (heightOffset * 2);
+            var rect = new Rectangle(x, MARGIN + heightOffset, gearWidth, gearHeight);
             if ((i + 1) == gears.RearCurrent)
                 formGraphics.FillRectangle(brushFill, rect);
 

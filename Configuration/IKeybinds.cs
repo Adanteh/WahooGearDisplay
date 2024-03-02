@@ -8,27 +8,32 @@ namespace WahooShift.Configuration;
 /// </summary>
 public interface IKeybinds
 {
-    string? RightFront { get; set;}
+    /// <summary>
+    /// Button handling enabled or not?
+    /// </summary>
+    bool? Enabled { get; set; }
 
-    string? RightBack { get; set;}
+    string? RightFront { get; set; }
 
-    string? RightInside { get; set;}
+    string? RightBack { get; set; }
 
-    string? RightLarge { get; set;}
+    string? RightInside { get; set; }
 
-    string? RightSmall { get; set;}
+    string? RightLarge { get; set; }
 
-    string? RightBrake { get; set;}
+    string? RightSmall { get; set; }
 
-    string? LeftFront { get; set;}
+    string? RightBrake { get; set; }
 
-    string? LeftBack { get; set;}
+    string? LeftFront { get; set; }
 
-    string? LeftInside { get; set;}
+    string? LeftBack { get; set; }
 
-    string? LeftLarge { get; set;}
+    string? LeftInside { get; set; }
 
-    string? LeftSmall { get; set;}
+    string? LeftLarge { get; set; }
 
-    string? LeftBrake { get; set;  }
+    string? LeftSmall { get; set; }
+
+    string? LeftBrake { get; set; }
 }
